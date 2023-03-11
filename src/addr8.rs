@@ -6,7 +6,7 @@ use crate::parser;
 #[repr(C)]
 #[derive(Debug, Default, Hash, Eq, PartialEq, Ord, PartialOrd, Copy, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct MacAddr8([u8; 8]);
+pub struct MacAddr8(pub(crate) [u8; 8]);
 
 impl MacAddr8 {
     /// Creates a new `MacAddr8` address from the bytes.

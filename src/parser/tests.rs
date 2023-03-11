@@ -174,3 +174,14 @@ fn test_parse_v8_different_delimiters() {
 
     assert!(addr.is_err());
 }
+
+#[test]
+#[cfg(feature = "serde")]
+fn test_deserialize_macaddr() {
+    let macs = serde_json::json!(["010203040506", "0102030405060708"]).to_string();
+    let macvec: Vec<MacAddr> = serde_json::de::from_str(&macs).unwrap();
+    assert!(macvec[0] == MacAddr::V6(MacAddr6([1, 2, 3, 4, 5, 6])));
+    assert!(macvec[1] == MacAddr::V8(MacAddr8([1, 2, 3, 4, 5, 6, 7, 8])));
+    let json = serde_json::to_string(&macvec).unwrap();
+    assert!(json == r#"["01:02:03:04:05:06","01:02:03:04:05:06:07:08"]"#);
+}
