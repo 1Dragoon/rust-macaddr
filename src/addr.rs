@@ -127,3 +127,14 @@ impl<'de> serde::Deserialize<'de> for MacAddr {
         Self::from_str(s).map_err(serde::de::Error::custom)
     }
 }
+
+#[cfg(feature = "schemars")]
+impl schemars::JsonSchema for MacAddr {
+    fn schema_name() -> String {
+        "String".into()
+    }
+
+    fn json_schema(gen: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
+        gen.subschema_for::<String>()
+    }
+}

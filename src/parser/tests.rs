@@ -4,8 +4,6 @@ use std::str::FromStr;
 #[cfg(not(feature = "std"))]
 use core::str::FromStr;
 
-use assert_matches::assert_matches;
-
 use crate::{MacAddr, MacAddr6, MacAddr8};
 
 #[test]
@@ -59,6 +57,16 @@ fn test_parse_v6_cisco_format() {
 }
 
 #[test]
+fn test_parse_v6_unformatted() {
+    let addr = MacAddr6::from_str("123456789ABC");
+
+    assert!(addr.is_ok());
+    let addr = addr.unwrap();
+
+    assert_eq!(&[0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC], addr.as_bytes());
+}
+
+#[test]
 fn test_parse_v8_canonical_format() {
     let addr = MacAddr8::from_str("12-34-56-78-9A-BC-DE-F0");
 
@@ -79,12 +87,22 @@ fn test_parse_v8_colon_format() {
 }
 
 #[test]
+fn test_parse_v8_unformatted() {
+    let addr = MacAddr8::from_str("123456789ABCDEF0");
+
+    assert!(addr.is_ok());
+    let addr = addr.unwrap();
+
+    assert_eq!(&[0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0], addr.as_bytes());
+}
+
+#[test]
 fn test_parse_canonical_format() {
     let addr = MacAddr::from_str("12-34-56-78-9A-BC-DE-F0");
 
     assert!(addr.is_ok());
     let addr = addr.unwrap();
-    assert_matches!(addr, MacAddr::V8(..));
+    assert_eq!(addr, MacAddr::V8(MacAddr8([0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0])));
     assert_eq!(&[0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0], addr.as_bytes());
 }
 
@@ -94,7 +112,7 @@ fn test_parse_colon_format() {
 
     assert!(addr.is_ok());
     let addr = addr.unwrap();
-    assert_matches!(addr, MacAddr::V8(..));
+    assert_eq!(addr, MacAddr::V8(MacAddr8([0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0])));
     assert_eq!(&[0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0], addr.as_bytes());
 }
 
@@ -183,5 +201,5 @@ fn test_deserialize_macaddr() {
     assert!(macvec[0] == MacAddr::V6(MacAddr6([1, 2, 3, 4, 5, 6])));
     assert!(macvec[1] == MacAddr::V8(MacAddr8([1, 2, 3, 4, 5, 6, 7, 8])));
     let json = serde_json::to_string(&macvec).unwrap();
-    assert!(json == r#"["01:02:03:04:05:06","01:02:03:04:05:06:07:08"]"#);
+    assert_eq!(json, r#"["010203040506","0102030405060708"]"#);
 }
